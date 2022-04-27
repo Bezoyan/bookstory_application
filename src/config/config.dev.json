@@ -1,0 +1,12 @@
+{
+    "database": {
+      "connectionString": "mongodb://localhost:27017/bookstore_db"
+    },
+    "server": {
+      "host": "localhost",
+      "port": 4000,
+      "routePrefix": "",
+      "plugins": ["logger"]
+    }
+}
+  

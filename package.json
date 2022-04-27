@@ -4,21 +4,33 @@
   "main": "lib/main.js",
   "license": "MIT",
   "scripts": {
-    "dev:tsc": "tsc --watch -p .",
-    "dev:servers": "nodemon -e js -w lib lib/main.js",
-    "dev": "nodemon --config nodemon.json src/app.ts"
+    "start:build": "tsc -w",
+    "start:run": "nodemon lib/main.js",
+    "start": "concurrently yarn:start:*"
   },
   "test": "NODE_ENV=test mocha -r ts-node/register test/**/*.test.ts",
   "dependencies": {
+    "@hapi/boom": "^9.1.4",
+    "@hapi/catbox-memory": "^5.0.1",
+    "@hapi/catbox-redis": "^6.0.2",
     "@hapi/hapi": "^20.2.1",
     "@types/body-parser": "^1.19.2",
     "@types/config": "^0.0.41",
     "@types/hapi-pino": "^8.0.5",
+    "@types/hapi__catbox-redis": "^5.0.4",
     "@types/mongoose": "^5.11.97",
+    "@types/nconf": "^0.10.2",
+    "concurrently": "^7.0.0",
     "config": "^3.3.7",
+    "dayjs": "^1.11.0",
+    "dotenv": "^16.0.0",
+    "good": "^8.1.2",
+    "good-console": "^8.0.0",
+    "good-squeeze": "^5.1.0",
     "hapi-pino": "^9.1.2",
     "joi": "^17.6.0",
-    "mongoose": "^6.2.6"
+    "mongoose": "^6.2.6",
+    "nconf": "^0.11.3"
   },
   "devDependencies": {
     "@types/chai": "^4.3.0",

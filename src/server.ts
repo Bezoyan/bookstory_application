@@ -1,42 +1,77 @@
 'use strict';
 
-import Hapi from "@hapi/hapi";
-import { Request, Server } from "@hapi/hapi";
+import * as Hapi from "@hapi/hapi";
+import * as Boom from "@hapi/boom";
+import { IPlugin } from "./plugins/interfaces";
+import { IServerConfigurations } from "./config";
+import * as Books from "./api/books";
+import * as Stores from "./api/stores";
+import { IDatabase } from "./db/connection";
+// import CatboxRedis from '@hapi/catbox-redis';
 
-import { helloRoutes } from "./hello";
-
-export let server: Server;
-
-function index(request: Request): string {
-    console.log("Processing request", request.info.id);
-    return "Hello! Nice to have met you.";
-}
-export const init = async function(): Promise<Server> {
-    server = Hapi.server({
-        port: process.env.PORT || 4000,
-        host: '0.0.0.0'
+export async function init(
+  configs: IServerConfigurations,
+  database: IDatabase
+): Promise<Hapi.Server> {
+  try {
+    const port = process.env.PORT;
+    const server = new Hapi.Server({
+      debug: { request: ['error'] },
+      host: '0.0.0.0',
+      port: port,
+      routes: {
+        cors: {
+          origin: ["*"]
+        }
+      },
+    //   cache: [
+    //     {
+    //         name: 'book_cache',
+    //         provider: {
+    //             constructor: CatboxRedis,
+    //             options: {
+    //                 partition : 'book_cached_data',
+    //                 host: 'redis-cluster.domain.com',
+    //                 port: 6379,
+    //                 database: 0,
+    //                 tls: {}
+    //             }
+    //         }
+    //     }
+    // ]
     });
 
+    if (configs.routePrefix) {
+      server.realm.modifiers.route.prefix = configs.routePrefix;
+    }
 
-    // Routes will go here
+    // Setup Hapi Plugins
+    const plugins: Array<string> = configs.plugins;
+    const pluginOptions = {
+      database: database,
+      serverConfigs: configs
+    };
 
-    server.route({
-        method: "GET",
-        path: "/",
-        handler: index
+    let pluginPromises: Promise<any>[] = [];
+
+    plugins.forEach((pluginName: string) => {
+      var plugin: IPlugin = require("./plugins/" + pluginName).default();
+      console.log(
+        `Register Plugin ${plugin.info().name} v${plugin.info().version}`
+      );
+      pluginPromises.push(plugin.register(server, pluginOptions));
     });
-    server.route(helloRoutes);
+
+    await Promise.all(pluginPromises);
+
+    
+    // Getting Routes
+    Books.init(server, configs, database);
+    Stores.init(server, configs, database);
+
 
     return server;
-};
-
-export const start = async function (): Promise<void> {
-    console.log(`Listening on ${server.settings.host}:${server.settings.port}`);
-    return server.start();
-};
-
-process.on('unhandledRejection', (err) => {
-    console.error("unhandledRejection");
-    console.error(err);
-    process.exit(1);
-});
+  } catch (error: any) {
+    throw Boom.badImplementation(error);
+  }
+}
