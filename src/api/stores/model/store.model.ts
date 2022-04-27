@@ -1,9 +1,7 @@
 import mongoose from "mongoose";
-import config from "config";
 import { BookDocument } from "../../books/model/book.model";
 
 export interface StoreDocument extends mongoose.Document {
-  //storeId: string;
   books: Array<BookDocument>;
   name: string;
   createdAt: Date;
@@ -11,8 +9,7 @@ export interface StoreDocument extends mongoose.Document {
 }
 
 export const StoreSchema = new mongoose.Schema(
-  { 
-    //storeId: { type: String, required: true },
+  {
     name: { type: String, required: true },
     books: [
       {

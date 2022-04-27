@@ -28,15 +28,11 @@ export interface IDataConfiguration {
 }
 
 export function getDatabaseConfig(): IDataConfiguration {
-  // console.log(configs.get("database"), 'fghfgh')
-  // return configs.get("database");
   let conf =   {connectionString : "mongodb://localhost:27017/bookstore_db"};
   return conf;
 }
 
 export function getServerConfigs(): IServerConfigurations {
-  // console.log(configs.get("server"), 'fghfgh')
-  // return configs.get("server");
   const config = { 
     host: "localhost",
     port: 4000,
