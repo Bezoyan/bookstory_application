@@ -4,6 +4,7 @@ import BookController from "../controller/book.controller";
 import * as BookValidator from "../validator/book.validator";
 import { IDatabase } from "../../../db/connection";
 import { IServerConfigurations } from "../../../config";
+import { request } from "http";
 
 export default function (
   server: Hapi.Server,
@@ -92,22 +93,24 @@ export default function (
     }
   });
 
-//   server.route({
-//     path: 'hapi/{ttl?}',
-//     method: 'GET',
-//     handler: function (request, h) {
-//         const response = h.response({ be: 'hapi' });
+  // Caching data with server method
+  server.method('getBooks', bookController.getBooks, {
+    cache: {
+      expiresIn: 60000,
+      staleIn: 30000,
+      staleTimeout: 10000,
+      generateTimeout: 100
+    }
+  });
 
-//         if (request.params.ttl) {
-//             response.ttl(request.params.ttl);
-//         }
-//         return response;
-//     },
-//     options: {
-//         cache: {
-//             expiresIn: 30 * 1000,
-//             privacy: 'private'
-//         }
-//     }
-// });
+  
+  server.route({
+    method: 'GET',
+    path: '/books/cache',
+    options: {
+      handler () {
+        return server.methods.getBooks();
+      }
+    }
+  });
 }

@@ -96,7 +96,7 @@ export default class BookController {
   
       return books;
     } catch(err) {
-      console.log(err)
+      return Boom.badRequest();
     }
   }
 

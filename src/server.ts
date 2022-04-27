@@ -7,7 +7,6 @@ import { IServerConfigurations } from "./config";
 import * as Books from "./api/books";
 import * as Stores from "./api/stores";
 import { IDatabase } from "./db/connection";
-// import CatboxRedis from '@hapi/catbox-redis';
 
 export async function init(
   configs: IServerConfigurations,
@@ -23,22 +22,7 @@ export async function init(
         cors: {
           origin: ["*"]
         }
-      },
-    //   cache: [
-    //     {
-    //         name: 'book_cache',
-    //         provider: {
-    //             constructor: CatboxRedis,
-    //             options: {
-    //                 partition : 'book_cached_data',
-    //                 host: 'redis-cluster.domain.com',
-    //                 port: 6379,
-    //                 database: 0,
-    //                 tls: {}
-    //             }
-    //         }
-    //     }
-    // ]
+      }
     });
 
     if (configs.routePrefix) {
